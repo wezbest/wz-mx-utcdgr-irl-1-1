@@ -77,5 +77,5 @@ volumes:
 2. u - panty@smell.com / p - Lickpussy9 / Email(fama) - `zikora.gurtaj@flyovertrees.com`
 3. Note it required a license key - `6e65c5f0-0396-47c9-9df4-291802e1685f`
 4. Note when you shut down , by `CTRl+C` , it is already installed and you can bring it back up with `bunx n8n`, this time it doesnt ask for license key.
-5. BootyFart - `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` , for some reason on the restart had to make another key
+5. BootyFart - `sk-or-v1-85` , for some reason on the restart had to make another key
 6. Confirmed bunx method works
