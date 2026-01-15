@@ -1,0 +1,43 @@
+binsider 0.2.1
+Orhun Parmaksız <orhunparmaksiz@gmail.com>
+Analyze ELF binaries like a boss
+
+Usage:
+  binsider [OPTIONS] [FILE]...
+
+Arguments:
+  [FILE]...
+          Binary / ELF object file
+          
+          [env: FILES=]
+
+Options:
+  -n, --min-len <MIN_STRINGS_LEN>
+          Minimum length of strings
+          
+          [env: MIN_STRINGS_LEN=]
+          [default: 15]
+
+  -t, --tab <TAB>
+          The initial application tab to open
+          
+          [env: TAB=]
+          [default: general]
+
+          Possible values:
+          - general:          General information
+          - static-analysis:  Static analysis
+          - dynamic-analysis: Dynamic analysis
+          - strings:          String
+          - hexdump:          Hexdump
+
+      --accent-color <COLOR>
+          Accent color of the application
+          
+          [env: ACCENT_COLOR=]
+
+  -h, --help
+          Print help (see a summary with '-h')
+
+  -V, --version
+          Print version

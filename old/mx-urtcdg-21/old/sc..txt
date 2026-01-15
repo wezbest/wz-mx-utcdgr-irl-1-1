@@ -1,0 +1,14 @@
+Scratch -
+
+locations:
+remote:          - commit: 45f5f974bbbd612a17199425317226f950e3fbb7
+remote:            path: WX/gcli/gc/bundle/gemini.js:78112
+remote:          - commit: 5d494733fc32d4ea3af160a0f9b0d4065287df9d
+remote:            path: WX/gcli/gc/bundle/gemini.js:78139
+remote:          - commit: c17d18f9a67c2c58a2b81664e65ef512e0bb4cd6
+remote:            path: WX/gcli/gc/packages/core/src/code_assist/oauth2.ts:33
+
+~ Commit to remove
+45f5f974bbbd612a17199425317226f950e3fbb7
+5d494733fc32d4ea3af160a0f9b0d4065287df9d
+c17d18f9a67c2c58a2b81664e65ef512e0bb4cd6

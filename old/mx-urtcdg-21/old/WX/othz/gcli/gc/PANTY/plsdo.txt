@@ -1,0 +1,13 @@
+# Commands to be executed 
+
+# General Information 
+1. After displaying any output keep writing 
+it out also to a file called "tasks.txt" with date and time appended at end of the file. 
+Inside a folder called "RPT". This file should have a header section, Which has todays date and time 
+the query which has been asked , and the model which was used. Also how many token were used and outputted
+
+# Tasks
+
+1. When i run gemini --help in the cli , I get some nice help text, How can color this help text, 
+with the arg is cyan and explanation in green ?
+2. DO NOT IMPLEMENT , In the report show me exactly what file will be changed and with what code. 

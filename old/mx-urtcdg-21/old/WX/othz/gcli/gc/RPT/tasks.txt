@@ -1,0 +1,196 @@
+# Gemini CLI Task Report
+
+**Date:** 2025-07-22
+**Time:** 12:00:00
+**Query:** When i run gemini --help in the cli , I get some nice help text, How can color this help text, with the arg is cyan and explanation in green ?
+**Model:** Gemini Pro
+
+---
+
+## Task: Colorize `gemini --help` output
+
+This report outlines the necessary changes to colorize the help text of the `gemini --help` command. The arguments will be colored cyan, and the explanations will be colored green.
+
+### Files to be Modified:
+
+1.  `packages/cli/src/config/config.ts`
+2.  `packages/cli/package.json`
+
+### Code Changes:
+
+#### 1. `packages/cli/package.json`
+
+A new dependency, `chalk`, will be added to handle the terminal string styling.
+
+```json
+{
+  "name": "@google/gemini-cli",
+  "version": "0.1.13",
+  "description": "Gemini CLI",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/google-gemini/gemini-cli.git"
+  },
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "gemini": "dist/index.js"
+  },
+  "scripts": {
+    "build": "node ../../scripts/build_package.js",
+    "start": "node dist/index.js",
+    "debug": "node --inspect-brk dist/index.js",
+    "lint": "eslint . --ext .ts,.tsx",
+    "format": "prettier --write .",
+    "test": "vitest run",
+    "test:ci": "vitest run --coverage",
+    "typecheck": "tsc --noEmit"
+  },
+  "files": [
+    "dist"
+  ],
+  "config": {
+    "sandboxImageUri": "us-docker.pkg.dev/gemini-code-dev/gemini-cli/sandbox:0.1.13"
+  },
+  "dependencies": {
+    "@google/gemini-cli-core": "file:../core",
+    "@iarna/toml": "^2.2.5",
+    "@types/update-notifier": "^6.0.8",
+    "chalk": "^5.3.0",
+    "command-exists": "^1.2.9",
+    "diff": "^7.0.0",
+    "dotenv": "^17.1.0",
+    "glob": "^10.4.1",
+    "highlight.js": "^11.11.1",
+    "ink": "^6.0.1",
+    "ink-big-text": "^2.0.0",
+    "ink-gradient": "^3.0.0",
+    "ink-link": "^4.1.0",
+    "ink-select-input": "^6.2.0",
+    "ink-spinner": "^5.0.0",
+    "lowlight": "^3.3.0",
+    "mime-types": "^3.0.1",
+    "open": "^10.1.2",
+    "react": "^19.1.0",
+    "read-package-up": "^11.0.0",
+    "shell-quote": "^1.8.3",
+    "string-width": "^7.1.0",
+    "strip-ansi": "^7.1.0",
+    "strip-json-comments": "^3.1.1",
+    "update-notifier": "^7.3.1",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "@babel/runtime": "^7.27.6",
+    "@testing-library/react": "^16.3.0",
+    "@types/command-exists": "^1.2.3",
+    "@types/diff": "^7.0.2",
+    "@types/dotenv": "^6.1.1",
+    "@types/node": "^20.11.24",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@types/semver": "^7.7.0",
+    "@types/shell-quote": "^1.7.5",
+    "@types/yargs": "^17.0.32",
+    "ink-testing-library": "^4.0.0",
+    "jsdom": "^26.1.0",
+    "pretty-format": "^30.0.2",
+    "react-dom": "^19.1.0",
+    "typescript": "^5.3.3",
+    "vitest": "^3.1.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
+```
+
+#### 2. `packages/cli/src/config/config.ts`
+
+The `yargs` configuration will be updated to use a custom help message with `chalk` for styling.
+
+```typescript
+import yargs from 'yargs/yargs';
+import { hideBin } from 'yargs/helpers';
+import process from 'node:process';
+import chalk from 'chalk'; // Added import
+import {
+  Config,
+  loadServerHierarchicalMemory,
+  setGeminiMdFilename as setServerGeminiMdFilename,
+  getCurrentGeminiMdFilename,
+  ApprovalMode,
+  DEFAULT_GEMINI_MODEL,
+  DEFAULT_GEMINI_EMBEDDING_MODEL,
+  DEFAULT_MEMORY_FILE_FILTERING_OPTIONS,
+  FileDiscoveryService,
+  TelemetryTarget,
+  FileFilteringOptions,
+  MCPServerConfig,
+  IDE_SERVER_NAME,
+} from '@google/gemini-cli-core';
+import { Settings } from './settings.js';
+
+import { Extension, annotateActiveExtensions } from './extension.js';
+import { getCliVersion } from '../utils/version.js';
+import { loadSandboxConfig } from './sandboxConfig.js';
+
+// ... (rest of the file)
+
+export async function parseArguments(): Promise<CliArgs> {
+  const yargsInstance = yargs(hideBin(process.argv))
+    .scriptName('gemini')
+    .usage(
+      '$0 [options]',
+      'Gemini CLI - Launch an interactive CLI, use -p/--prompt for non-interactive mode',
+    )
+    .option('model', {
+      alias: 'm',
+      type: 'string',
+      description: `Model`,
+      default: process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL,
+    })
+    // ... (other options)
+    .version(await getCliVersion()) // This will enable the --version flag based on package.json
+    .alias('v', 'version')
+    .help(false) // Disable default help
+    .alias('h', 'help')
+    .strict()
+    .check((argv) => {
+      if (argv.prompt && argv.promptInteractive) {
+        throw new Error(
+          'Cannot use both --prompt (-p) and --prompt-interactive (-i) together',
+        );
+      }
+      return true;
+    })
+    .epilogue(
+      chalk.cyan('Arguments:\n') +
+      '  --model, -m       ' + chalk.green('Model') + '\n' +
+      '  --prompt, -p      ' + chalk.green('Prompt. Appended to input on stdin (if any).') + '\n' +
+      '  --prompt-interactive, -i ' + chalk.green('Execute the provided prompt and continue in interactive mode') + '\n' +
+      '  --sandbox, -s     ' + chalk.green('Run in sandbox?') + '\n' +
+      '  --sandbox-image   ' + chalk.green('Sandbox image URI.') + '\n' +
+      '  --debug, -d       ' + chalk.green('Run in debug mode?') + '\n' +
+      '  --all-files, -a   ' + chalk.green('Include ALL files in context?') + '\n' +
+      '  --show-memory-usage ' + chalk.green('Show memory usage in status bar') + '\n' +
+      '  --yolo, -y        ' + chalk.green('Automatically accept all actions (aka YOLO mode, see https://www.youtube.com/watch?v=xvFZjo5PgG0 for more details)?') + '\n' +
+      '  --telemetry       ' + chalk.green('Enable telemetry? This flag specifically controls if telemetry is sent. Other --telemetry-* flags set specific values but do not enable telemetry on their own.') + '\n' +
+      '  --telemetry-target ' + chalk.green('Set the telemetry target (local or gcp). Overrides settings files.') + '\n' +
+      '  --telemetry-otlp-endpoint ' + chalk.green('Set the OTLP endpoint for telemetry. Overrides environment variables and settings files.') + '\n' +
+      '  --telemetry-log-prompts ' + chalk.green('Enable or disable logging of user prompts for telemetry. Overrides settings files.') + '\n' +
+      '  --checkpointing, -c ' + chalk.green('Enables checkpointing of file edits') + '\n' +
+      '  --experimental-acp ' + chalk.green('Starts the agent in ACP mode') + '\n' +
+      '  --allowed-mcp-server-names ' + chalk.green('Allowed MCP server names') + '\n' +
+      '  --extensions, -e  ' + chalk.green('A list of extensions to use. If not provided, all extensions are used.') + '\n' +
+      '  --list-extensions, -l ' + chalk.green('List all available extensions and exit.') + '\n' +
+      '  --ide-mode        ' + chalk.green('Run in IDE mode?') + '\n' +
+      '  --proxy           ' + chalk.green('Proxy for gemini client, like schema://user:password@host:port') + '\n' +
+      '  --version, -v     ' + chalk.green('Show version number') + '\n' +
+      '  --help, -h        ' + chalk.green('Show help')
+    );
+
+  yargsInstance.wrap(yargsInstance.terminalWidth());
+  return yargsInstance.argv;
+}
+```
